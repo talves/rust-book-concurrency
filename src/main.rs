@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 // use rust_book_concurrency;
 
 fn main() {
