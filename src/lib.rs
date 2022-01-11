@@ -35,6 +35,72 @@ pub fn message_threads() {
 
     thread::spawn(move || {
         let val = String::from("hi");
-        tx.send(val).unwrap();
+        println!("Sending the message: {}", val);
+        thread::sleep(Duration::from_millis(2000));
+        tx.send(val).unwrap(); // val has been moved into send because it takes ownership
     });
+
+    let received = rx.recv().unwrap(); // the value of `val` is sent to recv who now has ownership.
+    println!("Got: {}", received);
+}
+
+pub fn multi_message_threads() {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("...."),
+            String::from("multiple"),
+            String::from("messages"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rx {
+        println!("Got: {}", received);
+    }
+}
+
+pub fn multi_producers_threads() {
+    let (tx, rx) = mpsc::channel();
+
+    let tx1 = tx.clone();
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("tx: hi"),
+            String::from("tx: from"),
+            String::from("tx: the"),
+            String::from("tx: thread"),
+        ];
+
+        for val in vals {
+            tx1.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("tx1: more"),
+            String::from("tx1: messages"),
+            String::from("tx1: for"),
+            String::from("tx1: you"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rx {
+        println!("{}", received);
+    }
 }
