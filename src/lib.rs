@@ -18,3 +18,13 @@ pub fn spawn_threads(join_thread: bool) {
         thread::sleep(Duration::from_millis(1));
     }
 }
+
+pub fn move_closures_threads() {
+    let v = vec![1, 2, 3];
+
+    let handle = thread::spawn(move || {
+        println!("Here's a vector: {:?}", v);
+    });
+
+    handle.join().unwrap();
+}
