@@ -1,4 +1,7 @@
+use std::rc::Rc;
 use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
 
@@ -106,5 +109,36 @@ pub fn multi_producers_threads() {
 }
 
 pub fn shared_state_concurrency() {
-    ()
+    // https://doc.rust-lang.org/book/ch16-03-shared-state.html#the-api-of-mutext
+    println!("/nMutex");
+    let m = Mutex::new(5);
+
+    {
+        let mut num = m.lock().unwrap(); // aquire the lock and returns a MutexGuard (smart pointer)
+        println!("num = {:?}", num);
+
+        *num = 6;
+    }
+
+    println!("m = {:?}", m);
+
+    // Share the Mutex<T> between multiple threads using Arc (atomically reference counted)
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
 }
