@@ -36,7 +36,7 @@ pub fn message_threads() {
     thread::spawn(move || {
         let val = String::from("hi");
         println!("Sending the message: {}", val);
-        thread::sleep(Duration::from_millis(2000));
+        thread::sleep(Duration::from_millis(2));
         tx.send(val).unwrap(); // val has been moved into send because it takes ownership
     });
 
@@ -103,4 +103,8 @@ pub fn multi_producers_threads() {
     for received in rx {
         println!("{}", received);
     }
+}
+
+pub fn shared_state_concurrency() {
+    ()
 }

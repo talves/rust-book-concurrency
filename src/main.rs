@@ -11,4 +11,6 @@ fn main() {
     rust_book_concurrency::message_threads();
     rust_book_concurrency::multi_message_threads();
     rust_book_concurrency::multi_producers_threads();
+
+    rust_book_concurrency::shared_state_concurrency();
 }
